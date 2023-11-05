@@ -1,6 +1,8 @@
-using System.Linq;
 using KitchenLib;
+using KitchenLib.Logging;
+using KitchenLib.Logging.Exceptions;
 using KitchenMods;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -15,6 +17,7 @@ namespace KitchenMyMod
         public const string MOD_GAMEVERSION = ">=1.1.4";
 
         public static AssetBundle Bundle;
+        public static KitchenLogger Logger;
 
         public Mod() : base(MOD_GUID, MOD_NAME, MOD_AUTHOR, MOD_VERSION, MOD_GAMEVERSION, Assembly.GetExecutingAssembly()) { }
 
@@ -29,15 +32,8 @@ namespace KitchenMyMod
 
         protected override void OnPostActivate(KitchenMods.Mod mod)
         {
-            Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).First();
+            Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
+            Logger = InitLogger();
         }
-        #region Logging
-        public static void LogInfo(string _log) { Debug.Log($"[{MOD_NAME}] " + _log); }
-        public static void LogWarning(string _log) { Debug.LogWarning($"[{MOD_NAME}] " + _log); }
-        public static void LogError(string _log) { Debug.LogError($"[{MOD_NAME}] " + _log); }
-        public static void LogInfo(object _log) { LogInfo(_log.ToString()); }
-        public static void LogWarning(object _log) { LogWarning(_log.ToString()); }
-        public static void LogError(object _log) { LogError(_log.ToString()); }
-        #endregion
     }
 }
