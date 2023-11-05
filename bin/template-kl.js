@@ -35,11 +35,11 @@ async function SetupProject(rl)
     const authordisplayname = _author;
     const author = _author.split(' ').join('-').toLowerCase();
 
-    const projectDir = './' + modid;
+    const projectDir = './' + moddisplayname;
 
     if (await fs.existsSync(projectDir))
     {
-        console.log('Project ' + modid + ' already exists');
+        console.log('Project ' + moddisplayname + ' already exists');
         return false;
     }
 

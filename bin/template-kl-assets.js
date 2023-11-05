@@ -9,7 +9,7 @@ async function SetupProject(rl)
     const fs = require('fs');
     const readline = require("readline");
 
-    const templateDir = __dirname + '/template-kl';
+    const templateDir = __dirname + '/template-kl-assets';
 
     const _modid = await new Promise((resolve, reject) => {
         rl.question("What is your project's modid? ", function(answer) {
@@ -35,11 +35,11 @@ async function SetupProject(rl)
     const authordisplayname = _author;
     const author = _author.split(' ').join('-').toLowerCase();
 
-    const projectDir = './' + modid;
+    const projectDir = './' + moddisplayname;
 
     if (await fs.existsSync(projectDir))
     {
-        console.log('Project ' + modid + ' already exists');
+        console.log('Project ' + moddisplayname + ' already exists');
         return false;
     }
 
