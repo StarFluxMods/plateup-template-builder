@@ -23,7 +23,7 @@ namespace KitchenMyMod
 
         protected override void OnInitialise()
         {
-            LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
+            Logger.LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
         }
 
         protected override void OnUpdate()
