@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<Configurations>Release;Debug</Configurations>
+		<AssemblyName>$(MSBuildProjectName)-Workshop</AssemblyName>
+		<LangVersion>latest</LangVersion>
+		<NoWarn>CS0114</NoWarn>
+	</PropertyGroup>
+	
+	<ItemGroup>
+	  <Compile Remove="content\**" />
+	  <EmbeddedResource Remove="content\**" />
+	</ItemGroup>
+  
+	<ItemGroup>
+		<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="1.10.21" />
+	</ItemGroup>
+</Project>
