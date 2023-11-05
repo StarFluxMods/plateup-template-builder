@@ -34,11 +34,11 @@ async function SetupProject(rl)
     const namespace = _moddisplayname.split(' ').join('');
     const author = _author.split(' ').join('-').toLowerCase();
 
-    const projectDir = './' + moddisplayname;
+    const projectDir = './' + namespace;
 
     if (await fs.existsSync(projectDir))
     {
-        console.log('Project ' + moddisplayname + ' already exists');
+        console.log('Project ' + namespace + ' already exists');
         return false;
     }
 
