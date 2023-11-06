@@ -8,7 +8,7 @@
         <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/vendor/FileSaver.js"></script>
     </head>
-    <body>
+    <body class="pt-5">
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
@@ -16,15 +16,15 @@
                 <h2>Project Type</h2>
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="radio" id="project-type-standalone" name="project-type" checked />
-                    <label class="form-check-label" for="project-type-standalone">Standalone</label>
+                    <label class="form-check-label" for="project-type-standalone">Standalone <br /><small class="text-muted">Creates a barebones template ready to be used in your IDE, with the <a target="_blank" href="https://github.com/Yariazen/Yaraizen.PlateUp.ModBuildUtilities">Yaraizen.PlateUp.ModBuildUtilities</a> nuget package, which automatically pulls in dependencies and copies your mod to your game directory on build.</small></label>
                 </div>
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="radio" id="project-type-kitchenlib" name="project-type" />
-                    <label class="form-check-label" for="project-type-kitchenlib">KitchenLib</label>
+                    <label class="form-check-label" for="project-type-kitchenlib">KitchenLib <br /><small class="text-muted">The same as the above, but sets the mod up as a <a target="_blank" href="https://github.com/KitchenMods/KitchenLib">KitchenLib</a> mod, for when you want/need to make use of its features, but aren't planning on adding new assets.</small></label>
                 </div>
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="radio" id="project-type-kitchenlib-assets" name="project-type" />
-                    <label class="form-check-label" for="project-type-kitchenlib-assets">KitchenLib with Assets</label>
+                    <label class="form-check-label" for="project-type-kitchenlib-assets">KitchenLib with Assets <br /><small class="text-muted">The same as KitchenLib, but includes a Unity Project that's ready to be opened in Unity Hub. Useful when you want to create a content mod that adds food, appliances, etc.</small></small></label>
                 </div>
     
                 <h2>Project Metadata</h2>
@@ -39,15 +39,15 @@
                 </div>
                 <div class="form-floating mb-3">
                     <input class="form-control" type="text" id="metadata-guid" value="com.myname.mymod" required />
-                    <label for="metadata-guid">GUID</label>
+                    <label for="metadata-guid">GUID - Uniquely identifies your mod</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input class="form-control" type="text" id="metadata-namespace" value="MyMod" required />
+                    <input class="form-control" type="text" id="metadata-namespace" value="KitchenMyMod" required />
                     <label for="metadata-namespace">Namespace</label>
                 </div>
                 <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="metadata-use-kitchen-prefix">
-                    <label class="form-check-label" for="metadata-use-kitchen-prefix">Use "Kitchen" prefix in namespace (probably not needed in most cases)</label>
+                    <input class="form-check-input" type="checkbox" id="metadata-use-kitchen-prefix" checked>
+                    <label class="form-check-label" for="metadata-use-kitchen-prefix">Use "Kitchen" prefix in namespace</label>
                 </div>
                 <div class="form-floating mb-3">
                     <input class="form-control" type="text" id="metadata-version" value="0.1.0" required />
