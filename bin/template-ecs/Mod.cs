@@ -1,5 +1,5 @@
-using KitchenMods;
 using Kitchen;
+using KitchenMods;
 using UnityEngine;
 
 namespace KitchenMyMod
@@ -9,6 +9,7 @@ namespace KitchenMyMod
         public const string MOD_GUID = "com.example.mymod";
         public const string MOD_NAME = "My Mod";
         public const string MOD_VERSION = "0.1.0";
+        public const string MOD_AUTHOR = "My Name";
 
         protected override void Initialise()
         {
@@ -18,6 +19,7 @@ namespace KitchenMyMod
         protected override void OnUpdate()
         {
         }
+        
         #region Logging
         public static void LogInfo(string _log) { Debug.Log($"[{MOD_NAME}] " + _log); }
         public static void LogWarning(string _log) { Debug.LogWarning($"[{MOD_NAME}] " + _log); }
