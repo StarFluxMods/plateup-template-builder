@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <title>PlateUp Template Builder</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/vendor/FileSaver.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <form>
+                <h1>PlateUp Template Builder</h1>
+    
+                <h2>Project Type</h2>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" id="project-type-standalone" name="project-type" checked />
+                    <label class="form-check-label" for="project-type-standalone">Standalone</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" id="project-type-kitchenlib" name="project-type" />
+                    <label class="form-check-label" for="project-type-kitchenlib">KitchenLib</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" id="project-type-kitchenlib-assets" name="project-type" />
+                    <label class="form-check-label" for="project-type-kitchenlib-assets">KitchenLib with Assets</label>
+                </div>
+    
+                <h2>Project Metadata</h2>
+                <div class="form-floating mb-3">
+                    <input class="form-control" type="text" id="metadata-author" value="My Name" required />
+                    <label for="metadata-author">Author</label>
+                    <span></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control" type="text" id="metadata-modname" value="My Mod" required />
+                    <label for="metadata-modname">Mod Name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control" type="text" id="metadata-guid" value="com.myname.mymod" required />
+                    <label for="metadata-guid">GUID</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control" type="text" id="metadata-namespace" value="MyMod" required />
+                    <label for="metadata-namespace">Namespace</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="metadata-use-kitchen-prefix">
+                    <label class="form-check-label" for="metadata-use-kitchen-prefix">Use "Kitchen" prefix in namespace (probably not needed in most cases)</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control" type="text" id="metadata-version" value="0.1.0" required />
+                    <label for="metadata-version">Version</label>
+                </div>
+    
+                <input type="submit" id="generate" class="btn btn-primary" value="Generate" />
+            </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="./unityProjectFiles.js"></script>
+        <script type="text/javascript">
+            const standaloneElement = document.querySelector("#project-type-standalone");
+            const kitchenLibElement = document.querySelector("#project-type-kitchenlib");
+            const kitchenLibAssetsElement = document.querySelector("#project-type-kitchenlib-assets");
+            const authorElement = document.querySelector("#metadata-author");
+            const modNameElement = document.querySelector("#metadata-modname");
+            const modGuidElement = document.querySelector("#metadata-guid");
+            const namespaceElement = document.querySelector("#metadata-namespace");
+            const useKitchenPrefixElement = document.querySelector("#metadata-use-kitchen-prefix");
+            const versionElement = document.querySelector("#metadata-version");
+            const form = document.querySelector("form");
+
+            const authorStripped = () => authorElement.value.toLowerCase().replace(/[^a-z0-9]/gi, "");
+            const modNameStripped = () => modNameElement.value.replace(/[^a-z0-9]/gi, "");
+            const updateGuid = () => modGuidElement.value = `com.${authorStripped()}.${modNameStripped().toLowerCase()}`;
+            const isUseKitchenPrefix = () => useKitchenPrefixElement.checked;
+            const updateNamespace = () => namespaceElement.value = `${isUseKitchenPrefix() ? "Kitchen" : ""}${modNameStripped()}`;
+
+            authorElement.addEventListener("keyup", updateGuid);
+            modNameElement.addEventListener("keyup", () => {
+                updateGuid();
+                updateNamespace();
+            });
+            useKitchenPrefixElement.addEventListener("change", updateNamespace);
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                if (form.checkValidity()) {
+                    const zip = await createZip();
+                    zip.generateAsync({type: "blob"}).then(content => {
+                        saveAs(content, `${modNameStripped()}.zip`)
+                    });
+                }
+            });
+
+            const createZip = async () => {
+                if (standaloneElement.checked) {
+                    return createSimpleZipForProject("template-ecs");
+                } else if (kitchenLibElement.checked) {
+                    return createSimpleZipForProject("template-kl");
+                }
+                return createZipForKitchenLibWithAssets();
+            };
+
+            const createZipForKitchenLibWithAssets = async () => {
+                const zip = await createSimpleZipForProject("template-kl-assets");
+                const modName = modNameStripped();
+                const namespace = namespaceElement.value;
+                const unityPath = `${modName}/UnityProject - ${namespace}/`;
+                const getAndAddUnityFileToZip = async (zip, filename) => zip.file(`${unityPath}${filename}`, await (await fetch(`/plateup-template-builder/bin/template-kl-assets/UnityProject/${filename}`)).text());
+                for (const file of unityProjectFiles) {
+                    await getAndAddUnityFileToZip(zip, file);
+                }
+                return zip;
+            };
+
+            const createSimpleZipForProject = async (templateType) => {
+                const zip = new JSZip();
+                const modName = modNameStripped();
+
+                const modCs = await (await fetch(`/plateup-template-builder/bin/${templateType}/Mod.cs`)).text();
+                const gitignore = await fetch(`/plateup-template-builder/bin/${templateType}/templategitignore`);
+                const projectFile = await (await fetch(`/plateup-template-builder/bin/${templateType}/ModName.csproj`)).text();
+
+                zip.file(`${modName}/Mod.cs`, replacePlaceholdersInModCs(modCs));
+                zip.file(`${modName}/.gitignore`, await gitignore.text());
+                zip.file(`${modName}/${modNameStripped()}.csproj`, replacePlaceholdersInProjectFile(projectFile));
+                return zip;
+            };
+
+            const replacePlaceholdersInModCs = (modCs) => modCs
+                .replaceAll("KitchenMyMod", namespaceElement.value)
+                .replaceAll("com.example.mymod", modGuidElement.value)
+                .replaceAll("My Mod", modNameElement.value)
+                .replaceAll("My Name", authorElement.value)
+                .replaceAll("0.1.0", versionElement.value);
+            const replacePlaceholdersInProjectFile = (projectFile) => projectFile.replaceAll("UnityProject", `UnityProject - ${namespaceElement.value}`);
+        </script>
+    </body>
+</html>
