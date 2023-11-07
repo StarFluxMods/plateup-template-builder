@@ -1,6 +1,6 @@
 {
   "name": "plateup-template-builder",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Sets up a custom template for plateup mods",
   "main": "bin/index.js",
   "author": "StarFluxGames",

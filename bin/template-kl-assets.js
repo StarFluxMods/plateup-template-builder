@@ -69,10 +69,12 @@ async function SetupProject(rl)
     const modcs = fs.readFileSync(templateDir + '/Mod.cs', 'utf-8');
     const modnamecsproj = fs.readFileSync(templateDir + '/ModName.csproj', 'utf-8');
     const gitignore = fs.readFileSync(templateDir + '/templategitignore', 'utf-8');
+    const unitygitignore = fs.readFileSync(templateDir + '/UnityProject/templategitignore', 'utf-8');
 
     let modcsnew = "";
     let modnamecsprojnew = "";
     let gitignorenew = "";
+    let unitygitignorenew = "";
 
 
     modcs.split(/\r?\n/).forEach(line =>  {
@@ -91,7 +93,12 @@ async function SetupProject(rl)
         gitignorenew += line + '\n';
     });
 
+    unitygitignore.split(/\r?\n/).forEach(line =>  {
+        unitygitignorenew += line + '\n';
+    });
+
     await fs.writeFileSync('./' + projectDir + '/.gitignore', gitignorenew);
+    await fs.writeFileSync('./' + projectDir + 'UnityProject - ' + namespace + '/.gitignore', unitygitignorenew);
 
     try {
       fs.cpSync(templateDir + '/UnityProject', './' + projectDir + '/UnityProject - ' + namespace, {
