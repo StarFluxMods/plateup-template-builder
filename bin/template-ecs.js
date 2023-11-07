@@ -38,6 +38,7 @@ async function SetupProject(rl)
     const moddisplayname = _moddisplayname;
     const projectDir = _moddisplayname.split(' ').join('');
     let namespace = _moddisplayname.split(' ').join('');
+    const authordisplayname = _author;
     const author = _author.split(' ').join('-').toLowerCase();
 
     if (config.prefixNamespace)
@@ -75,7 +76,7 @@ async function SetupProject(rl)
 
 
     modcs.split(/\r?\n/).forEach(line =>  {
-        modcsnew += line.replace('KitchenMyMod', namespace).replace('com.example.mymod', 'com.' + author + '.' + modid).replace('My Mod', moddisplayname) + '\n';
+        modcsnew += line.replace('KitchenMyMod', namespace).replace('com.example.mymod', 'com.' + author + '.' + modid).replace('My Mod', moddisplayname).replace('My Name', authordisplayname) + '\n';
     });
 
     await fs.writeFileSync('./' + projectDir + '/Mod.cs', modcsnew);
