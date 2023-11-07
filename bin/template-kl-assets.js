@@ -98,7 +98,6 @@ async function SetupProject(rl)
     });
 
     await fs.writeFileSync('./' + projectDir + '/.gitignore', gitignorenew);
-    await fs.writeFileSync('./' + projectDir + 'UnityProject - ' + namespace + '/.gitignore', unitygitignorenew);
 
     try {
       fs.cpSync(templateDir + '/UnityProject', './' + projectDir + '/UnityProject - ' + namespace, {
@@ -107,6 +106,9 @@ async function SetupProject(rl)
     } catch (error) {
       console.log(error.message);
     }
+
+    await fs.writeFileSync('./' + projectDir + '/UnityProject - ' + namespace + '/.gitignore', unitygitignorenew);
+    await fs.rmSync('./' + projectDir + '/UnityProject - ' + namespace + '/templategitignore');
 
     if (config.generateGit)
     {
