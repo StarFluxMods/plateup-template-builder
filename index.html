@@ -15,23 +15,22 @@
     
                 <h2>Project Type</h2>
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" id="project-type-standalone" name="project-type" checked />
+                    <input class="form-check-input saveable" type="radio" id="project-type-standalone" name="project-type" checked />
                     <label class="form-check-label" for="project-type-standalone">Standalone <br /><small class="text-muted">Creates a barebones template ready to be used in your IDE, with the <a target="_blank" href="https://github.com/Yariazen/Yaraizen.PlateUp.ModBuildUtilities">Yaraizen.PlateUp.ModBuildUtilities</a> nuget package, which automatically pulls in dependencies and copies your mod to your game directory on build.</small></label>
                 </div>
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" id="project-type-kitchenlib" name="project-type" />
+                    <input class="form-check-input saveable" type="radio" id="project-type-kitchenlib" name="project-type" />
                     <label class="form-check-label" for="project-type-kitchenlib">KitchenLib <br /><small class="text-muted">The same as the above, but sets the mod up as a <a target="_blank" href="https://github.com/KitchenMods/KitchenLib">KitchenLib</a> mod, for when you want/need to make use of its features, but aren't planning on adding new assets.</small></label>
                 </div>
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" id="project-type-kitchenlib-assets" name="project-type" />
+                    <input class="form-check-input saveable" type="radio" id="project-type-kitchenlib-assets" name="project-type" />
                     <label class="form-check-label" for="project-type-kitchenlib-assets">KitchenLib with Assets <br /><small class="text-muted">The same as KitchenLib, but includes a Unity Project that's ready to be opened in Unity Hub. Useful when you want to create a content mod that adds food, appliances, etc.</small></small></label>
                 </div>
     
                 <h2>Project Metadata</h2>
                 <div class="form-floating mb-3">
-                    <input class="form-control" type="text" id="metadata-author" value="My Name" required />
+                    <input class="form-control saveable" type="text" id="metadata-author" value="My Name" required />
                     <label for="metadata-author">Author</label>
-                    <span></span>
                 </div>
                 <div class="form-floating mb-3">
                     <input class="form-control" type="text" id="metadata-modname" value="My Mod" required />
@@ -46,20 +45,35 @@
                     <label for="metadata-namespace">Namespace</label>
                 </div>
                 <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="metadata-use-kitchen-prefix" checked>
+                    <input class="form-check-input saveable" type="checkbox" id="metadata-use-kitchen-prefix" checked />
                     <label class="form-check-label" for="metadata-use-kitchen-prefix">Use "Kitchen" prefix in namespace</label>
                 </div>
                 <div class="form-floating mb-3">
                     <input class="form-control" type="text" id="metadata-version" value="0.1.0" required />
                     <label for="metadata-version">Version</label>
                 </div>
+
+                <div class="card mb-3" hidden>
+                    <div class="card-body">
+                        <div class="card-title">Other settings</div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input saveable" type="checkbox" id="other-settings-create-git-repo" />
+                                <label class="form-check-label" for="other-settings-create-git-repo">Generate Git repository in project directory</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     
-                <input type="submit" id="generate" class="btn btn-primary" value="Generate" />
+                <button id="generate" class="btn btn-primary">Generate</button>
             </form>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
         <script type="text/javascript" src="./unityProjectFiles.js"></script>
+        <script type="text/javascript" src="./gitFiles.js"></script>
         <script type="text/javascript">
+            const SETTINGS_KEY = "settings";
+            const URL_PREFIX = ""; // change to "https://yourghpage.github.io/" when testing locally
+
             const standaloneElement = document.querySelector("#project-type-standalone");
             const kitchenLibElement = document.querySelector("#project-type-kitchenlib");
             const kitchenLibAssetsElement = document.querySelector("#project-type-kitchenlib-assets");
@@ -69,12 +83,15 @@
             const namespaceElement = document.querySelector("#metadata-namespace");
             const useKitchenPrefixElement = document.querySelector("#metadata-use-kitchen-prefix");
             const versionElement = document.querySelector("#metadata-version");
+            const generateGitRepoElement = document.querySelector("#other-settings-create-git-repo");
             const form = document.querySelector("form");
+            const generateButton = document.querySelector("#generate");
 
             const authorStripped = () => authorElement.value.toLowerCase().replace(/[^a-z0-9]/gi, "");
             const modNameStripped = () => modNameElement.value.replace(/[^a-z0-9]/gi, "");
             const updateGuid = () => modGuidElement.value = `com.${authorStripped()}.${modNameStripped().toLowerCase()}`;
-            const isUseKitchenPrefix = () => useKitchenPrefixElement.checked;
+            const isChecked = element => element.checked;
+            const isUseKitchenPrefix = () => isChecked(useKitchenPrefixElement);
             const updateNamespace = () => namespaceElement.value = `${isUseKitchenPrefix() ? "Kitchen" : ""}${modNameStripped()}`;
 
             authorElement.addEventListener("keyup", updateGuid);
@@ -88,45 +105,58 @@
                 e.preventDefault();
 
                 if (form.checkValidity()) {
+                    saveSettings();
+                    disableButton();
                     const zip = await createZip();
                     zip.generateAsync({type: "blob"}).then(content => {
-                        saveAs(content, `${modNameStripped()}.zip`)
+                        saveAs(content, `${modNameStripped()}.zip`);
+                        reenableButton();
                     });
                 }
             });
 
+            const disableButton = () => {
+                generateButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`;
+                generateButton.setAttribute("disabled", "disabled");
+            };
+
+            const reenableButton = () => {
+                generateButton.removeAttribute("disabled");
+                generateButton.innerHTML = "Generate";
+            };
+
             const createZip = async () => {
                 if (standaloneElement.checked) {
-                    return createSimpleZipForProject("template-ecs");
+                    return createBaseZipForProject("template-ecs");
                 } else if (kitchenLibElement.checked) {
-                    return createSimpleZipForProject("template-kl");
+                    return createBaseZipForProject("template-kl");
                 }
                 return createZipForKitchenLibWithAssets();
             };
 
             const createZipForKitchenLibWithAssets = async () => {
-                const zip = await createSimpleZipForProject("template-kl-assets");
+                const zip = await createBaseZipForProject("template-kl-assets");
                 const modName = modNameStripped();
                 const namespace = namespaceElement.value;
                 const unityPath = `${modName}/UnityProject - ${namespace}/`;
-                const getAndAddUnityFileToZip = async (zip, filename) => zip.file(`${unityPath}${filename}`, await (await fetch(`/plateup-template-builder/bin/template-kl-assets/UnityProject/${filename}`)).text());
-                for (const file of unityProjectFiles) {
-                    await getAndAddUnityFileToZip(zip, file);
+                for (const filename of unityProjectFiles) {
+                    zip.file(`${unityPath}${filename}`, await fetchText(`bin/template-kl-assets/UnityProject/${filename}`));
                 }
                 return zip;
             };
 
-            const createSimpleZipForProject = async (templateType) => {
+            const createBaseZipForProject = async (templateType) => {
                 const zip = new JSZip();
                 const modName = modNameStripped();
 
-                const modCs = await (await fetch(`/plateup-template-builder/bin/${templateType}/Mod.cs`)).text();
-                const gitignore = await fetch(`/plateup-template-builder/bin/${templateType}/templategitignore`);
-                const projectFile = await (await fetch(`/plateup-template-builder/bin/${templateType}/ModName.csproj`)).text();
+                const modCs = await fetchText(`bin/${templateType}/Mod.cs`);
+                const gitignore = await fetchText(`bin/${templateType}/templategitignore`);
+                const projectFile = await fetchText(`bin/${templateType}/ModName.csproj`);
 
                 zip.file(`${modName}/Mod.cs`, replacePlaceholdersInModCs(modCs));
-                zip.file(`${modName}/.gitignore`, await gitignore.text());
+                zip.file(`${modName}/.gitignore`, gitignore);
                 zip.file(`${modName}/${modNameStripped()}.csproj`, replacePlaceholdersInProjectFile(projectFile));
+                await addGitFilesIfNeeded(zip);
                 return zip;
             };
 
@@ -136,7 +166,40 @@
                 .replaceAll("My Mod", modNameElement.value)
                 .replaceAll("My Name", authorElement.value)
                 .replaceAll("0.1.0", versionElement.value);
+
             const replacePlaceholdersInProjectFile = (projectFile) => projectFile.replaceAll("UnityProject", `UnityProject - ${namespaceElement.value}`);
+
+            const addGitFilesIfNeeded = async (zip) => {
+                if (isChecked(generateGitRepoElement)) {
+                    for (const filename of gitFiles) {
+                        zip.file(`.git/${filename}`, await fetchText(`bin/extras/_git/${filename}`));
+                    }
+                }
+            };
+
+            const fetchText = async path => await (await fetch(`${URL_PREFIX}/plateup-template-builder/${path}`)).text();
+
+            const saveSettings = () => {
+                const settings = [...document.querySelectorAll(".saveable")]
+                    .reduce((settings, currentElement) => ({...settings, [currentElement.id]: currentElement[valueAttributeByElementType(currentElement)]}), {});
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+            };
+
+            const loadSettings = () => {
+                if (localStorage.getItem(SETTINGS_KEY) !== null) {
+                    const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+                    Object.entries(settings).forEach(([id, value]) => {
+                        const element = document.querySelector(`#${id}`);
+                        element[valueAttributeByElementType(element)] = value;
+                    });
+                    updateGuid();
+                    updateNamespace();
+                }
+            };
+
+            const valueAttributeByElementType = element => element.type === "text" ? "value" : "checked";
+
+            loadSettings();
         </script>
     </body>
 </html>
