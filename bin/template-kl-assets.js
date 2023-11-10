@@ -109,17 +109,6 @@ async function SetupProject(rl)
 
     await fs.writeFileSync('./' + projectDir + '/UnityProject - ' + namespace + '/.gitignore', unitygitignorenew);
     await fs.rmSync('./' + projectDir + '/UnityProject - ' + namespace + '/templategitignore');
-
-    if (config.generateGit)
-    {
-        try {
-          fs.cpSync(gitDir, './' + projectDir + '/.git', {
-            recursive: true,
-          });
-        } catch (error) {
-          console.log(error.message);
-        }
-    }
     
     console.log('Project ' + modid + ' created');
     process.exit();

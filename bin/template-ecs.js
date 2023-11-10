@@ -93,17 +93,6 @@ async function SetupProject(rl)
 
     await fs.writeFileSync('./' + projectDir + '/.gitignore', gitignorenew);
 
-    if (config.generateGit)
-    {
-        try {
-          fs.cpSync(gitDir, './' + projectDir + '/.git', {
-            recursive: true,
-          });
-        } catch (error) {
-          console.log(error.message);
-        }
-    }
-
     console.log('Project ' + modid + ' created');
     process.exit();
 }

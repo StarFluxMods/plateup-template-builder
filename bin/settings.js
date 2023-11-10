@@ -22,17 +22,8 @@ async function Setup(rl)
     {
         console.log('1. [ ] Prefix namespace with \'Kitchen\'');
     }
-    
-    if (config.generateGit)
-    {
-        console.log('2. [X] Generate Git repository in project directory');
-    }
-    else
-    {
-        console.log('2. [ ] Generate Git repository in project directory');
-    }
 
-    console.log('3. Back');
+    console.log('2. Back');
     const result = await new Promise((resolve, reject) => {
         rl.question("> ", function(answer) {
             resolve(answer);
@@ -46,12 +37,6 @@ async function Setup(rl)
         await Setup(rl);
     }
     else if (result == '2')
-    {
-        config.generateGit = !config.generateGit;
-        fs.writeFile(SaveFile, JSON.stringify(config), function writeJSON(err) {});
-        await Setup(rl);
-    }
-    else if (result == '3')
     {
         return;
     }
