@@ -9,13 +9,18 @@ let rl = readline.createInterface({
 const templateecs = require('./template-ecs');
 const templatekl = require('./template-kl');
 const templateklassets = require('./template-kl-assets');
+const settings = require('./settings');
 
 async function Start()
 {
+    console.clear();
     console.log('Which template would you like to use?');
     console.log('1. Standard ECS');
     console.log('2. Standard KitchenLib');
     console.log('3. Standard KitchenLib with assets');
+    console.log('4. Global Settings');
+    console.log('');
+    console.log('5. Exit');
     const result = await new Promise((resolve, reject) => {
         rl.question("> ", function(answer) {
             resolve(answer);
@@ -24,21 +29,30 @@ async function Start()
 
     if (result == '1')
     {
-        templateecs.SetupProject(rl);
+        await templateecs.SetupProject(rl);
     }
     else if (result == '2')
     {
-        templatekl.SetupProject(rl);
+        await templatekl.SetupProject(rl);
     }
     else if (result == '3')
     {
-        templateklassets.SetupProject(rl);
+        await templateklassets.SetupProject(rl);
+    }
+    else if (result == '4')
+    {
+        await settings.Setup(rl);
+    }
+    else if (result == '5')
+    {
+        console.clear();
+        process.exit();
     }
     else
     {
         console.log('Invalid option');
-        Start();
     }
+    Start();
 }
 
 Start();

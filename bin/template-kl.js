@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 
+const LoadFile = './config.json';
+const config = require(LoadFile);
+
 module.exports = {
     SetupProject: SetupProject
 };
 
 async function SetupProject(rl)
 {
+    console.clear();
     const fs = require('fs');
     const readline = require("readline");
     
     const templateDir = __dirname + '/template-kl';
+    const gitDir = __dirname + '/extras/_git';
 
     const _modid = await new Promise((resolve, reject) => {
         rl.question("What is your project's modid? ", function(answer) {
@@ -31,19 +36,23 @@ async function SetupProject(rl)
     
     const modid = _modid.split(' ').join('-').toLowerCase();
     const moddisplayname = _moddisplayname;
-    const namespace = _moddisplayname.split(' ').join('');
+    const projectDir = _moddisplayname.split(' ').join('');
+    let namespace = _moddisplayname.split(' ').join('');
     const authordisplayname = _author;
     const author = _author.split(' ').join('-').toLowerCase();
 
-    const projectDir = './' + namespace;
-
-    if (await fs.existsSync(projectDir))
+    if (config.prefixNamespace)
     {
-        console.log('Project ' + namespace + ' already exists');
+        namespace = 'Kitchen' + namespace;
+    }
+
+    if (await fs.existsSync('./' + projectDir))
+    {
+        console.log('Project ' + projectDir + ' already exists');
         return false;
     }
 
-    await fs.mkdirSync(projectDir);
+    await fs.mkdirSync('./' + projectDir);
 
     if (await !fs.existsSync(templateDir))
     {
@@ -70,21 +79,32 @@ async function SetupProject(rl)
         modcsnew += line.replace('KitchenMyMod', namespace).replace('com.example.mymod', 'com.' + author + '.' + modid).replace('My Mod', moddisplayname).replace('My Name', authordisplayname) + '\n';
     });
 
-    await fs.writeFileSync(projectDir + '/Mod.cs', modcsnew);
+    await fs.writeFileSync('./' + projectDir + '/Mod.cs', modcsnew);
     
     modnamecsproj.split(/\r?\n/).forEach(line =>  {
         modnamecsprojnew += line + '\n';
     });
 
-    await fs.writeFileSync(projectDir + '/' + namespace + '.csproj', modnamecsprojnew);
+    await fs.writeFileSync('./' + projectDir + '/' + namespace + '.csproj', modnamecsprojnew);
     
     gitignore.split(/\r?\n/).forEach(line =>  {
         gitignorenew += line + '\n';
     });
 
-    await fs.writeFileSync(projectDir + '/.gitignore', gitignorenew);
+    await fs.writeFileSync('./' + projectDir + '/.gitignore', gitignorenew);
 
-      console.log('Project ' + modid + ' created');
-      process.exit();
+    if (config.generateGit)
+    {
+        try {
+          fs.cpSync(gitDir, './' + projectDir + '/.git', {
+            recursive: true,
+          });
+        } catch (error) {
+          console.log(error.message);
+        }
+    }
+    
+    console.log('Project ' + modid + ' created');
+    process.exit();
     
 }
