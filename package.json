@@ -5,6 +5,9 @@
   "main": "bin/index.js",
   "author": "StarFluxGames",
   "license": "MIT",
+  "scripts": {
+    "build-gh": "node ./bin/build-ghpage.js"
+  },
   "bin": {
     "plateup": "bin/index.js"
   }
