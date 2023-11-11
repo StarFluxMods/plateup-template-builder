@@ -139,7 +139,13 @@
                 const namespace = namespaceElement.value;
                 const unityPath = `${modName}/UnityProject - ${namespace}/`;
                 for (const filename of unityProjectFiles) {
-                    zip.file(`${unityPath}${filename}`, await fetchText(`bin/modules/files/UnityProject/${filename}`));
+                    if (filename == 'templategitignore')
+                    {
+                        zip.file(`${unityPath}.gitignore`, await fetchText(`bin/modules/files/UnityProject/${filename}`));
+                    }else
+                    {
+                        zip.file(`${unityPath}${filename}`, await fetchText(`bin/modules/files/UnityProject/${filename}`));
+                    }
                 }
                 return zip;
             };
