@@ -14,6 +14,7 @@ const settings = require('./settings');
 async function Start()
 {
     console.clear();
+    console.log('PlateUp! Mod Template Builder v' + require('../package.json').version);
     console.log('Which template would you like to use?');
     console.log('1. Standard ECS');
     console.log('2. Standard KitchenLib');

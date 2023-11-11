@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const Utils = require('./modules/Utils.js');
 const LoadFile = './config.json';
 const config = require(LoadFile);
 
@@ -12,9 +13,6 @@ async function SetupProject(rl)
     console.clear();
     const fs = require('fs');
     const readline = require("readline");
-    
-    const templateDir = __dirname + '/template-kl';
-    const gitDir = __dirname + '/extras/_git';
 
     const _modid = await new Promise((resolve, reject) => {
         rl.question("What is your project's modid? ", function(answer) {
@@ -35,65 +33,21 @@ async function SetupProject(rl)
     });
     
     const modid = _modid.split(' ').join('-').toLowerCase();
-    const moddisplayname = _moddisplayname;
     const projectDir = _moddisplayname.split(' ').join('');
-    let namespace = _moddisplayname.split(' ').join('');
-    const authordisplayname = _author;
-    const author = _author.split(' ').join('-').toLowerCase();
 
-    if (config.prefixNamespace)
+    if (!await Utils.SetupProjectRoot(projectDir))
     {
-        namespace = 'Kitchen' + namespace;
-    }
-
-    if (await fs.existsSync('./' + projectDir))
-    {
-        console.log('Project ' + projectDir + ' already exists');
         return false;
     }
 
-    await fs.mkdirSync('./' + projectDir);
+    await Utils.SetupModCS(projectDir, 'kitchenlib', _modid, _moddisplayname, _author);
 
-    if (await !fs.existsSync(templateDir))
-    {
-        console.log('Template directory does not exist');
-        return false;
-    }
-
-    if (await !fs.existsSync(templateDir + '/Mod.cs'))
-    {
-        console.log('Template Mod.cs does not exist');
-        return false;
-    }
-
-    const modcs = fs.readFileSync(templateDir + '/Mod.cs', 'utf-8');
-    const modnamecsproj = fs.readFileSync(templateDir + '/ModName.csproj', 'utf-8');
-    const gitignore = fs.readFileSync(templateDir + '/templategitignore', 'utf-8');
-
-    let modcsnew = "";
-    let modnamecsprojnew = "";
-    let gitignorenew = "";
-
-
-    modcs.split(/\r?\n/).forEach(line =>  {
-        modcsnew += line.replace('KitchenMyMod', namespace).replace('com.example.mymod', 'com.' + author + '.' + modid).replace('My Mod', moddisplayname).replace('My Name', authordisplayname) + '\n';
-    });
-
-    await fs.writeFileSync('./' + projectDir + '/Mod.cs', modcsnew);
+    await Utils.SetupCSProj(projectDir, projectDir);
     
-    modnamecsproj.split(/\r?\n/).forEach(line =>  {
-        modnamecsprojnew += line + '\n';
-    });
-
-    await fs.writeFileSync('./' + projectDir + '/' + namespace + '.csproj', modnamecsprojnew);
+    await Utils.SetupGitIgnore(projectDir);
     
-    gitignore.split(/\r?\n/).forEach(line =>  {
-        gitignorenew += line + '\n';
-    });
+    await Utils.SetupChangelogFolders(projectDir);
 
-    await fs.writeFileSync('./' + projectDir + '/.gitignore', gitignorenew);
-    
     console.log('Project ' + modid + ' created');
     process.exit();
-    
 }

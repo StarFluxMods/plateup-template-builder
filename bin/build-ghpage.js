@@ -17,5 +17,4 @@ const buildScriptForDirectory = (directory, variableAndScriptName) => {
     console.log(variableAndScriptName, scriptContents);
 }
 
-buildScriptForDirectory("bin/template-kl-assets/UnityProject/", "unityProjectFiles");
-buildScriptForDirectory("bin/extras/_git/", "gitFiles");
+buildScriptForDirectory("bin/modules/files/UnityProject/", "unityProjectFiles");

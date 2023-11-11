@@ -126,20 +126,20 @@
 
             const createZip = async () => {
                 if (standaloneElement.checked) {
-                    return createBaseZipForProject("template-ecs");
+                    return createBaseZipForProject("ECS");
                 } else if (kitchenLibElement.checked) {
-                    return createBaseZipForProject("template-kl");
+                    return createBaseZipForProject("KitchenLib");
                 }
                 return createZipForKitchenLibWithAssets();
             };
 
             const createZipForKitchenLibWithAssets = async () => {
-                const zip = await createBaseZipForProject("template-kl-assets");
+                const zip = await createBaseZipForProject("KitchenLibAssets");
                 const modName = modNameStripped();
                 const namespace = namespaceElement.value;
                 const unityPath = `${modName}/UnityProject - ${namespace}/`;
                 for (const filename of unityProjectFiles) {
-                    zip.file(`${unityPath}${filename}`, await fetchText(`bin/template-kl-assets/UnityProject/${filename}`));
+                    zip.file(`${unityPath}${filename}`, await fetchText(`bin/modules/files/UnityProject/${filename}`));
                 }
                 return zip;
             };
@@ -148,9 +148,9 @@
                 const zip = new JSZip();
                 const modName = modNameStripped();
 
-                const modCs = await fetchText(`bin/${templateType}/Mod.cs`);
-                const gitignore = await fetchText(`bin/${templateType}/templategitignore`);
-                const projectFile = await fetchText(`bin/${templateType}/ModName.csproj`);
+                const modCs = await fetchText(`bin/modules/files/${templateType}.cs`);
+                const gitignore = await fetchText(`bin/modules/files/gitignoretemplate`);
+                const projectFile = await fetchText(`bin/modules/files/ModName.csproj`);
 
                 zip.file(`${modName}/Mod.cs`, replacePlaceholdersInModCs(modCs));
                 zip.file(`${modName}/.gitignore`, gitignore);

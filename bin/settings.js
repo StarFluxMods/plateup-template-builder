@@ -23,7 +23,16 @@ async function Setup(rl)
         console.log('1. [ ] Prefix namespace with \'Kitchen\'');
     }
 
-    console.log('2. Back');
+    if (config.generateChangelogFolders)
+    {
+        console.log('2. [X] Generate changelog folders');
+    }
+    else
+    {
+        console.log('2. [ ] Generate changelog folders');
+    }
+
+    console.log('3. Back');
     const result = await new Promise((resolve, reject) => {
         rl.question("> ", function(answer) {
             resolve(answer);
@@ -37,6 +46,12 @@ async function Setup(rl)
         await Setup(rl);
     }
     else if (result == '2')
+    {
+        config.generateChangelogFolders = !config.generateChangelogFolders;
+        fs.writeFile(SaveFile, JSON.stringify(config), function writeJSON(err) {});
+        await Setup(rl);
+    }
+    else if (result == '3')
     {
         return;
     }
