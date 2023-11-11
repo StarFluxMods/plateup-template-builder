@@ -52,6 +52,10 @@
                     <input class="form-control" type="text" id="metadata-version" value="0.1.0" required />
                     <label for="metadata-version">Version</label>
                 </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input saveable" type="checkbox" id="metadata-generate-changelogs" checked />
+                    <label class="form-check-label" for="metadata-generate-changelogs">Generate Changelog Folders</label>
+                </div>
 
                 <div class="card mb-3" hidden>
                     <div class="card-body">
@@ -81,6 +85,7 @@
             const modGuidElement = document.querySelector("#metadata-guid");
             const namespaceElement = document.querySelector("#metadata-namespace");
             const useKitchenPrefixElement = document.querySelector("#metadata-use-kitchen-prefix");
+            const generateChangelogElement = document.querySelector("#metadata-generate-changelogs");
             const versionElement = document.querySelector("#metadata-version");
             const generateGitRepoElement = document.querySelector("#other-settings-create-git-repo");
             const form = document.querySelector("form");
@@ -91,6 +96,7 @@
             const updateGuid = () => modGuidElement.value = `com.${authorStripped()}.${modNameStripped().toLowerCase()}`;
             const isChecked = element => element.checked;
             const isUseKitchenPrefix = () => isChecked(useKitchenPrefixElement);
+            const ShouldGenerateChangelogs = () => isChecked(generateChangelogElement);
             const updateNamespace = () => namespaceElement.value = `${isUseKitchenPrefix() ? "Kitchen" : ""}${modNameStripped()}`;
 
             authorElement.addEventListener("keyup", updateGuid);
@@ -161,6 +167,13 @@
                 zip.file(`${modName}/Mod.cs`, replacePlaceholdersInModCs(modCs));
                 zip.file(`${modName}/.gitignore`, gitignore);
                 zip.file(`${modName}/${modNameStripped()}.csproj`, replacePlaceholdersInProjectFile(projectFile));
+
+                if (ShouldGenerateChangelogs())
+                {
+                    zip.folder(`${modName}/Changelogs`);
+                    zip.folder(`${modName}/Changelogs/Github`);
+                    zip.folder(`${modName}/Changelogs/Workshop`);
+                }
                 await addGitFilesIfNeeded(zip);
                 return zip;
             };
