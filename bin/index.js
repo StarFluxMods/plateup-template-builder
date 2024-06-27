@@ -1,59 +1,72 @@
-#!/usr/bin/env node
+const ConfigManager = require('./utils/config-manager.js');
+const menuUtils = require('./utils/menu-utils.js');
 
-const readline = require("readline");
-let rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+const templateEcs = require('./menus/template-ecs.js');
+const templateKitchenLib = require('./menus/template-kitchenlib.js');
+const templateKitchenLibassets = require('./menus/template-kitchenlib-assets.js');
+const templateKitchenLibexample = require('./menus/template-kitchenlib-example.js');
+const settings = require('./menus/settings.js');
 
-const templateecs = require('./template-ecs');
-const templatekl = require('./template-kl');
-const templateklassets = require('./template-kl-assets');
-const settings = require('./settings');
-
-async function Start()
+async function Run()
 {
     console.clear();
     console.log('PlateUp! Mod Template Builder v' + require('../package.json').version);
     console.log('Which template would you like to use?');
     console.log('1. Standard ECS');
     console.log('2. Standard KitchenLib');
-    console.log('3. Standard KitchenLib with assets');
-    console.log('4. Global Settings');
+    console.log('3. Standard KitchenLib with Assets');
+    console.log('4. Standard KitchenLib with Example');
+    console.log('5. Global Settings');
     console.log('');
-    console.log('5. Exit');
-    const result = await new Promise((resolve, reject) => {
-        rl.question("> ", function(answer) {
-            resolve(answer);
-        });
-    });
+    console.log('6. Exit');
+
+    let result = await menuUtils.GetUserInput("> ");
 
     if (result == '1')
     {
-        await templateecs.SetupProject(rl);
+        await templateEcs.Run();
+        await Run();
     }
-    else if (result == '2')
+
+    if (result == '2')
     {
-        await templatekl.SetupProject(rl);
+        await templateKitchenLib.Run();
+        await Run();
     }
-    else if (result == '3')
+
+    if (result == '3')
     {
-        await templateklassets.SetupProject(rl);
+        await templateKitchenLibassets.Run();
+        await Run();
     }
-    else if (result == '4')
+
+    if (result == '4')
     {
-        await settings.Setup(rl);
+        await templateKitchenLibexample.Run();
+        await Run();
     }
-    else if (result == '5')
+
+    if (result == '5')
+    {
+        await settings.Run();
+        await Run();
+    }
+
+    if (result == '6')
     {
         console.clear();
         process.exit();
     }
-    else
+
+    return;
+}
+
+async function Start()
+{
+    while (true)
     {
-        console.log('Invalid option');
+        await Run();
     }
-    Start();
 }
 
 Start();
