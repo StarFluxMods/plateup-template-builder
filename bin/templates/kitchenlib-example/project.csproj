@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="1.13.255" />
+		<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="1.13.0" />
 	</ItemGroup>
 	
 	<ItemGroup>

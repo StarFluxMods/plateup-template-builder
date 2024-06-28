@@ -17,9 +17,9 @@ namespace KitchenMyMod
 
         public Mod() : base(MOD_GUID, MOD_NAME, MOD_AUTHOR, MOD_VERSION, MOD_GAMEVERSION, Assembly.GetExecutingAssembly()) { }
 
-        protected override void Initialise()
+        protected override void OnInitialise()
         {
-            LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
+            Logger.LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
         }
 
         protected override void OnUpdate()

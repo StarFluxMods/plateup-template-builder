@@ -6,7 +6,7 @@
   "author": "StarFluxGames",
   "license": "MIT",
   "scripts": {
-    "build-gh": "node ./bin/build-ghpage.js"
+    "build-gh": "node ./web/build-ghpage.js"
   },
   "bin": {
     "plateup": "bin/index.js"
