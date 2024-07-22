@@ -15,7 +15,7 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-                <h6>v2.0.1b</h6>
+                <h6>v2.0.1</h6>
                 <br>
 
                 <h2>Project Type</h2>
@@ -92,14 +92,25 @@
         <script type="text/javascript">
             const SETTINGS_KEY = "settings";
             const URL_PREFIX = "https://starfluxmods.github.io/plateup-template-builder/"; // change to "https://yourghpage.github.io/" when testing locally
-            const API_URL = "https://api.plateupmodding.com/plateup_template_counter/";
-            
-            $data = Get(`${API_URL}`);
-            
+
+            // find text with id 'test' and replace it with the number 5
+
+            console.log(['1']);
+            /*
+            getJSONP('http://localhost/plateup_template_counter/', function(data){
+                console.log(data);
+                
             document.getElementById('ecs').innerHTML = $data['ecs'];
-            document.getElementById('kl').innerHTML = $data['kl'];
-            document.getElementById('kl-assets').innerHTML = $data['kl-assets'];
-            document.getElementById('kl-example').innerHTML = $data['kl-example'];
+            document.getElementById('kl').innerHTML = 5;
+            document.getElementById('kl-assets').innerHTML = 5;
+            document.getElementById('kl-example').innerHTML = 5;
+            
+            }); 
+            */
+
+            $data = Get('http://localhost/plateup_template_counter');
+
+            console.log($data);
 
             const standaloneElement = document.querySelector("#project-type-standalone");
             const kitchenLibElement = document.querySelector("#project-type-kitchenlib");
@@ -145,16 +156,6 @@
                         saveAs(content, `${modNameStripped()}.zip`);
                         reenableButton();
                     });
-                }
-
-                if (standaloneElement.checked) {
-                    Get(`${API_URL}?template=ecs`);
-                } else if (kitchenLibElement.checked) {
-                    Get(`${API_URL}?template=kl`);
-                } else if (kitchenLibAssetsElement.checked) {
-                    Get(`${API_URL}?template=kl-assets`);
-                } else if (kitchenLibExampleElement.checked) {
-                    Get(`${API_URL}?template=kl-example`);
                 }
             });
 
@@ -364,11 +365,11 @@
             };
 
             function Get(yourUrl){
-                var Httpreq = new XMLHttpRequest();
-                Httpreq.open("GET",yourUrl,false);
-                Httpreq.send(null);
-                return JSON.parse(Httpreq.responseText);          
-            }
+    var Httpreq = new XMLHttpRequest(); // a new request
+    Httpreq.open("GET",yourUrl,false);
+    Httpreq.send(null);
+    return JSON.parse(Httpreq.responseText);          
+}
         </script>
     </body>
 </html>
