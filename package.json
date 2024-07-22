@@ -1,6 +1,6 @@
 {
   "name": "plateup-template-builder",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Sets up a custom template for plateup mods",
   "main": "bin/index.js",
   "author": "StarFluxGames",
@@ -9,6 +9,6 @@
     "build-gh": "node ./web/build-ghpage.js"
   },
   "bin": {
-    "plateup": "bin/index.js"
+    "plateup": "node ./bin/index.js"
   }
 }
