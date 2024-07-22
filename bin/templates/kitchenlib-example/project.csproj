@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<AssetBundlePath>UnityProject - MyMod\content\mod.assets</AssetBundlePath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="NUGET_VERSION" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Remove="UnityProject - MyMod\**" />
+	  <None Remove="UnityProject - MyMod\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Condition="Exists('Changelogs')" Include="Changelogs\" />
+		<Folder Condition="Exists('Changelogs\Github')" Include="Changelogs\Github" />
+		<Folder Condition="Exists('Changelogs\Workshop')" Include="Changelogs\Workshop" />
+	</ItemGroup>
+</Project>

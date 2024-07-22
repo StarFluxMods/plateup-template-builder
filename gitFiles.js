@@ -1,2 +1,0 @@
-/* This is an auto-generated file. Use npm run build-gh to update this file. */
-        const gitFiles = ["config","description","HEAD","hooks/applypatch-msg.sample","hooks/commit-msg.sample","hooks/fsmonitor-watchman.sample","hooks/post-update.sample","hooks/pre-applypatch.sample","hooks/pre-commit.sample","hooks/pre-merge-commit.sample","hooks/pre-push.sample","hooks/pre-rebase.sample","hooks/pre-receive.sample","hooks/prepare-commit-msg.sample","hooks/push-to-checkout.sample","hooks/sendemail-validate.sample","hooks/update.sample","info/exclude"];
