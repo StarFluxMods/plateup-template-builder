@@ -15,7 +15,9 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-    
+                <h6>v2.0.0</h6>
+                <br>
+
                 <h2>Project Type</h2>
                 <div class="form-check mb-3">
                     <input class="form-check-input saveable" type="radio" id="project-type-standalone" name="project-type" checked />
@@ -32,6 +34,7 @@
                 <div class="form-check mb-3">
                     <input class="form-check-input saveable" type="radio" id="project-type-kitchenlib-example" name="project-type" />
                     <label class="form-check-label" for="project-type-kitchenlib-example">KitchenLib with Example <br /><small class="text-muted">The same as KitchenLib with Assets, but includes an example Dish ready to be built on.</small></small></label>
+                    <br><small class="text-muted">Note: Includes assets from Vanilla PlateUp, and assets provided by <a href="https://github.com/DepletedNova">DepletedNova</a></small></small></label>
                 </div>
     
                 <h2>Project Metadata</h2>
@@ -59,6 +62,10 @@
                     <input class="form-control" type="text" id="metadata-version" value="0.1.0" required />
                     <label for="metadata-version">Version</label>
                 </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control" type="text" id="metadata-nugetversion" value="1.11.5" required />
+                    <label for="metadata-nugetversion">Nuget Version - Don't change unless required</label>
+                </div>
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input saveable" type="checkbox" id="metadata-generate-changelogs" checked />
                     <label class="form-check-label" for="metadata-generate-changelogs">Generate Changelog Folders</label>
@@ -81,6 +88,7 @@
         <script type="text/javascript" src="./kitchenlibassets.js"></script>
         <script type="text/javascript" src="./kitchenlibexample.js"></script>
         <script type="text/javascript" src="./kitchenlibexamplecustoms.js"></script>
+        <script type="text/javascript" src="./bin/utils/global-references.js"></script>
         <script type="text/javascript">
             const SETTINGS_KEY = "settings";
             const URL_PREFIX = "https://starfluxmods.github.io/plateup-template-builder/"; // change to "https://yourghpage.github.io/" when testing locally
@@ -96,9 +104,12 @@
             const useKitchenPrefixElement = document.querySelector("#metadata-use-kitchen-prefix");
             const generateChangelogElement = document.querySelector("#metadata-generate-changelogs");
             const versionElement = document.querySelector("#metadata-version");
+            const nugetVersionElement = document.querySelector("#metadata-nugetversion");
             const generateGitRepoElement = document.querySelector("#other-settings-create-git-repo");
             const form = document.querySelector("form");
             const generateButton = document.querySelector("#generate");
+
+            nugetVersionElement.value = NUGET_VERSION;
 
             const authorStripped = () => authorElement.value.toLowerCase().replace(/[^a-z0-9]/gi, "");
             const modNameStripped = () => modNameElement.value.replace(/[^a-z0-9]/gi, "");
@@ -141,148 +152,116 @@
 
             const createZip = async () => {
                 if (standaloneElement.checked) {
-                    return createZipForECS();
-                }
-                else if (kitchenLibElement.checked) {
-                    return createZipForKitchenKib();
-                }
-                else if (kitchenLibAssetsElement.checked) {
-                    return createZipForKitchenKibAssets();
-                }
-                else if (kitchenLibExampleElement.checked) {
-                    return createZipForKitchenKibExample();
+                    return await createZipForECS();
+                } else if (kitchenLibElement.checked) {
+                    return await createZipForKitchenLib();
+                } else if (kitchenLibAssetsElement.checked) {
+                    return await createZipForKitchenLibAssets();
+                } else if (kitchenLibExampleElement.checked) {
+                    return await createZipForKitchenLibExample();
                 }
 
                 return null;
-                
             };
 
             const createZipForECS = async() => {
-                let zip = new JSZip();
+                const zip = new JSZip();
                 const modName = modNameStripped();
 
-                let gitignore = await fetchText(`bin/templates/ecs/template.gitignore`);
-                let modCs = await fetchText(`bin/templates/ecs/Mod.cs`);
-                let projectFile = await fetchText(`bin/templates/ecs/project.csproj`);
+                await addGitignoreToZip(zip, modName, `bin/templates/ecs/template.gitignore`);
+                await addModCsToZip(zip, modName, `bin/templates/ecs/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `bin/templates/ecs/project.csproj`);
 
-                modCs = modCs.replaceAll("KitchenMyMod", namespaceElement.value)
-                    .replaceAll("com.example.mymod", modGuidElement.value)
-                    .replaceAll("My Mod", modNameElement.value)
-                    .replaceAll("My Name", authorElement.value)
-                    .replaceAll("0.1.0", versionElement.value);
-
-                zip.file(`${modName}/Mod.cs`, modCs);
-                zip.file(`${modName}/.gitignore`, gitignore);
-                zip.file(`${modName}/${modNameStripped()}.csproj`, projectFile);
-
-                if (ShouldGenerateChangelogs())
-                {
-                    zip = AddChangelogsToZip(zip);
-                }
-
-                return zip;
+                return await addChangelogsToZipIfNeeded(zip);
             };
 
-            const createZipForKitchenKib = async() => {
-                let zip = new JSZip();
+            const createZipForKitchenLib = async () => {
+                const zip = new JSZip();
                 const modName = modNameStripped();
 
-                let gitignore = await fetchText(`bin/templates/kitchenlib/template.gitignore`);
-                let modCs = await fetchText(`bin/templates/kitchenlib/Mod.cs`);
-                let projectFile = await fetchText(`bin/templates/kitchenlib/project.csproj`);
+                await addGitignoreToZip(zip, modName, `bin/templates/kitchenlib/template.gitignore`);
+                await addModCsToZip(zip, modName, `bin/templates/kitchenlib/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `bin/templates/kitchenlib/project.csproj`);
 
-                modCs = modCs.replaceAll("KitchenMyMod", namespaceElement.value)
-                    .replaceAll("com.example.mymod", modGuidElement.value)
-                    .replaceAll("My Mod", modNameElement.value)
-                    .replaceAll("My Name", authorElement.value)
-                    .replaceAll("0.1.0", versionElement.value);
-
-                zip.file(`${modName}/Mod.cs`, modCs);
-                zip.file(`${modName}/.gitignore`, gitignore);
-                zip.file(`${modName}/${modNameStripped()}.csproj`, projectFile);
-
-                if (ShouldGenerateChangelogs())
-                {
-                    zip = AddChangelogsToZip(zip);
-                }
-
-                return zip;
+                return await addChangelogsToZipIfNeeded(zip);
             };
 
-            const createZipForKitchenKibAssets = async() => {
-                let zip = new JSZip();
+            const createZipForKitchenLibAssets = async () => {
+                const zip = new JSZip();
                 const modName = modNameStripped();
 
-                let gitignore = await fetchText(`bin/templates/kitchenlib-assets/template.gitignore`);
-                let modCs = await fetchText(`bin/templates/kitchenlib-assets/Mod.cs`);
-                let projectFile = await fetchText(`bin/templates/kitchenlib-assets/project.csproj`);
+                await addGitignoreToZip(zip, modName, `bin/templates/kitchenlib-assets/template.gitignore`);
+                await addModCsToZip(zip, modName, `bin/templates/kitchenlib-assets/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `bin/templates/kitchenlib-assets/project.csproj`);
+                await addUnityProjectToZip(zip, modName, `bin/templates/kitchenlib-assets/UnityProject - MyMod`, kitchenlibassets);
 
-                modCs = modCs.replaceAll("KitchenMyMod", namespaceElement.value)
-                    .replaceAll("com.example.mymod", modGuidElement.value)
-                    .replaceAll("My Mod", modNameElement.value)
-                    .replaceAll("My Name", authorElement.value)
-                    .replaceAll("0.1.0", versionElement.value);
-
-                    projectFile = projectFile.replaceAll("KitchenMyMod", modName);  
-                    gitignore = gitignore.replaceAll("KitchenMyMod", modName);  
-
-                zip.file(`${modName}/Mod.cs`, modCs);
-                zip.file(`${modName}/.gitignore`, gitignore);
-                zip.file(`${modName}/${modNameStripped()}.csproj`, projectFile);
-
-                const unityPath = `${modName}/UnityProject - ${modName}/`;
-
-                for (const filename of kitchenlibassets) {
-                    handleFiles(zip, unityPath, `bin/templates/kitchenlib-assets/UnityProject - KitchenMyMod`, filename);
-                }
-
-                if (ShouldGenerateChangelogs())
-                {
-                    zip = AddChangelogsToZip(zip);
-                }
-
-                return zip;
+                return await addChangelogsToZipIfNeeded(zip);
             };
 
-            const createZipForKitchenKibExample = async() => {
-                let zip = new JSZip();
+            const createZipForKitchenLibExample = async() => {
+                const zip = new JSZip();
                 const modName = modNameStripped();
 
-                let gitignore = await fetchText(`bin/templates/kitchenlib-example/template.gitignore`);
-                let modCs = await fetchText(`bin/templates/kitchenlib-example/Mod.cs`);
-                let projectFile = await fetchText(`bin/templates/kitchenlib-example/project.csproj`);
+                await addGitignoreToZip(zip, modName, `bin/templates/kitchenlib-example/template.gitignore`);
+                await addModCsToZip(zip, modName, `bin/templates/kitchenlib-example/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `bin/templates/kitchenlib-example/project.csproj`);
+                await addUnityProjectToZip(zip, modName, `bin/templates/kitchenlib-example/UnityProject - MyMod`, kitchenlibexample);
 
-                modCs = modCs.replaceAll("KitchenMyMod", namespaceElement.value)
-                    .replaceAll("com.example.mymod", modGuidElement.value)
-                    .replaceAll("My Mod", modNameElement.value)
-                    .replaceAll("My Name", authorElement.value)
-                    .replaceAll("0.1.0", versionElement.value);
-
-                    projectFile = projectFile.replaceAll("KitchenMyMod", modName);  
-                    gitignore = gitignore.replaceAll("KitchenMyMod", modName);  
-
-                zip.file(`${modName}/Mod.cs`, modCs);
-                zip.file(`${modName}/.gitignore`, gitignore);
-                zip.file(`${modName}/${modNameStripped()}.csproj`, projectFile);
-
-                const unityPath = `${modName}/UnityProject - ${modName}/`;
-
-                for (const filename of kitchenlibexample) {
-                    handleFiles(zip, unityPath, `bin/templates/kitchenlib-example/UnityProject - KitchenMyMod`, filename);
-                }
                 for (const filename of kitchenlibexamplecustoms) {
                     let file = await fetchText(`bin/templates/kitchenlib-example/Customs/${filename}`);
-                    file = file.replaceAll("KitchenMyMod", modName);
+                    file = file.replaceAll("KitchenMyMod", namespaceElement.value);
                     zip.file(`${modName}/Customs/${filename}`, file);
                 }
 
-                if (ShouldGenerateChangelogs())
-                {
-                    zip = AddChangelogsToZip(zip);
+                return await addChangelogsToZipIfNeeded(zip);
+            };
+
+            const addGitignoreToZip = async (zip, modName, pathToGitignore) => {
+                const gitignore = await fetchText(pathToGitignore);
+                zip.file(`${modName}/.gitignore`, replacePlaceholdersInGitignore(gitignore, modName));
+            };
+
+            const addModCsToZip = async (zip, modName, pathToModCs) => {
+                const modCs = await fetchText(pathToModCs);
+                zip.file(`${modName}/Mod.cs`, replacePlaceholdersInModCs(modCs));
+            };
+
+            const addProjectFileToZip = async (zip, modName, pathToProjectFile) => {
+                const projectFile = await fetchText(pathToProjectFile);
+                zip.file(`${modName}/${modName}.csproj`, replacePlaceholdersInProjectFile(projectFile, modName));
+            };
+
+            const replacePlaceholdersInModCs = (modCs) => {
+                return modCs.replaceAll("KitchenMyMod", namespaceElement.value)
+                    .replaceAll("com.example.mymod", modGuidElement.value)
+                    .replaceAll("My Mod", modNameElement.value)
+                    .replaceAll("My Name", authorElement.value)
+                    .replaceAll("0.1.0", versionElement.value);
+            };
+
+            const replacePlaceholdersInGitignore = (gitignore, modName) => {
+                return gitignore.replaceAll("MyMod", modName);  
+            };
+
+            const replacePlaceholdersInProjectFile = (projectFile, modName) => {
+                return projectFile.replaceAll("NUGET_VERSION", nugetVersionElement.value)
+                .replaceAll("MyMod", modName);  
+            };
+
+            const addUnityProjectToZip = async (zip, modName, pathPrefix, files) => {
+                const unityPath = `${modName}/UnityProject - ${modName}/`;
+                for (const filename of files) {
+                    await handleFiles(zip, unityPath, pathPrefix, filename);
+                }
+            };
+
+            const addChangelogsToZipIfNeeded = async (zip) => {
+                if (ShouldGenerateChangelogs()) {
+                    zip = await AddChangelogsToZip(zip);
                 }
 
                 return zip;
-            };
+            }
 
             const AddChangelogsToZip = async (zip) => {
                 const modName = modNameStripped();
@@ -340,32 +319,31 @@
             };
 
             const fetchFBXData = async (filename) => {
-    try {
-        const response = await fetch(`${filename}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
-        }
-        const blob = await response.blob();
-        return blob;
-    } catch (error) {
-        console.error(`Error fetching ${filename}:`, error);
-        return null;
-    }
-};
+                try {
+                    const response = await fetch(`${filename}`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
+                    }
+                    return await response.blob();
+                } catch (error) {
+                    console.error(`Error fetching ${filename}:`, error);
+                    return null;
+                }
+            };
 
-const fetchOggData = async (filename) => {
-    try {
-        const response = await fetch(`${filename}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
-        }
-        const arrayBuffer = await response.arrayBuffer();
-        return new Blob([arrayBuffer], { type: 'audio/ogg' });
-    } catch (error) {
-        console.error(`Error fetching ${filename}:`, error);
-        return null;
-    }
-};
+            const fetchOggData = async (filename) => {
+                try {
+                    const response = await fetch(`${filename}`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
+                    }
+                    const arrayBuffer = await response.arrayBuffer();
+                    return new Blob([arrayBuffer], { type: 'audio/ogg' });
+                } catch (error) {
+                    console.error(`Error fetching ${filename}:`, error);
+                    return null;
+                }
+            };
         </script>
     </body>
 </html>

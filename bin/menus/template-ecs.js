@@ -1,6 +1,7 @@
 const menuUtils = require('../utils/menu-utils.js');
 const generationUtils = require('../utils/generation-utils.js');
 const ConfigManager = require('../utils/config-manager.js');
+const GlobalReferences = require('../utils/global-references.js');
 const fs = require('fs');
 
 const templatePath = './bin/templates/ecs';
@@ -34,6 +35,12 @@ async function Run() {
     if (await fs.existsSync('./' + cleanedProjectName + '/project.csproj'))
     {
         await fs.renameSync('./' + cleanedProjectName + '/project.csproj', './' + cleanedProjectName + '/' + cleanedProjectName + '.csproj');
+        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/' + cleanedProjectName + '.csproj', 'NUGET_VERSION', GlobalReferences.NUGET_VERSION);
+    }
+
+    if (await fs.existsSync('./' + cleanedProjectName + '/template.gitignore'))
+    {
+        await fs.renameSync('./' + cleanedProjectName + '/template.gitignore', './' + cleanedProjectName + '/' + '.gitignore');
     }
     
     if (await fs.existsSync('./' + cleanedProjectName + '/Mod.cs'))

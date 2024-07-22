@@ -3,15 +3,16 @@
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<AssetBundlePath>UnityProject - MyMod\content\mod.assets</AssetBundlePath>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="1.13.0" />
+		<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="NUGET_VERSION" />
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <Compile Remove="UnityProject - KitchenMyMod\**" />
-	  <None Remove="UnityProject - KitchenMyMod\**" />
+	  <Compile Remove="UnityProject - MyMod\**" />
+	  <None Remove="UnityProject - MyMod\**" />
 	</ItemGroup>
 
 	<ItemGroup>

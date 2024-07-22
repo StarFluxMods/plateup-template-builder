@@ -1,6 +1,7 @@
 const menuUtils = require('../utils/menu-utils.js');
 const generationUtils = require('../utils/generation-utils.js');
 const ConfigManager = require('../utils/config-manager.js');
+const GlobalReferences = require('../utils/global-references.js');
 const fs = require('fs');
 
 const templatePath = './bin/templates/kitchenlib-assets';
@@ -33,8 +34,14 @@ async function Run() {
 
     if (await fs.existsSync('./' + cleanedProjectName + '/project.csproj'))
     {
-        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/project.csproj', 'KitchenMyMod', namespace);
         await fs.renameSync('./' + cleanedProjectName + '/project.csproj', './' + cleanedProjectName + '/' + cleanedProjectName + '.csproj');
+        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/' + cleanedProjectName + '.csproj', 'MyMod', cleanedProjectName);
+        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/' + cleanedProjectName + '.csproj', 'NUGET_VERSION', GlobalReferences.NUGET_VERSION);
+    }
+
+    if (await fs.existsSync('./' + cleanedProjectName + '/template.gitignore'))
+    {
+        await fs.renameSync('./' + cleanedProjectName + '/template.gitignore', './' + cleanedProjectName + '/' + '.gitignore');
     }
     
     if (await fs.existsSync('./' + cleanedProjectName + '/Mod.cs'))
@@ -47,10 +54,10 @@ async function Run() {
     
     if (await fs.existsSync('./' + cleanedProjectName + '/.gitignore'))
     {
-        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/.gitignore', 'KitchenMyMod', namespace);
+        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/.gitignore', 'MyMod', namespace);
     }
 
-    await fs.renameSync('./' + cleanedProjectName + '/UnityProject - KitchenMyMod', './' + cleanedProjectName + '/UnityProject - ' + cleanedProjectName);
+    await fs.renameSync('./' + cleanedProjectName + '/UnityProject - MyMod', './' + cleanedProjectName + '/UnityProject - ' + cleanedProjectName);
 
     // Copy Changelog Template to project directory
 
