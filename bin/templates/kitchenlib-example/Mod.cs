@@ -9,6 +9,7 @@ using KitchenMyMod.Customs.Dishes;
 using KitchenMyMod.Customs.ItemGroups;
 using KitchenMyMod.Customs.Items;
 using UnityEngine;
+using KitchenLogger = KitchenLib.Logging.KitchenLogger;
 
 namespace KitchenMyMod
 {
