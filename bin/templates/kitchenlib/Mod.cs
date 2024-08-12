@@ -2,6 +2,7 @@ using KitchenLib;
 using KitchenLib.Logging;
 using KitchenMods;
 using System.Reflection;
+using KitchenLogger = KitchenLib.Logging.KitchenLogger;
 
 namespace KitchenMyMod
 {

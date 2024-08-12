@@ -5,6 +5,7 @@ using KitchenMods;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using KitchenLogger = KitchenLib.Logging.KitchenLogger;
 
 namespace KitchenMyMod
 {
