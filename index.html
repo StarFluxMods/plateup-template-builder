@@ -367,7 +367,15 @@
                 var Httpreq = new XMLHttpRequest();
                 Httpreq.open("GET",yourUrl,false);
                 Httpreq.send(null);
-                return JSON.parse(Httpreq.responseText);          
+
+                var messageObject;
+                try {
+                    messageObject = JSON.parse(message);
+                } catch (e) {
+                    messageObject = JSON.parse('{"ecs":"Failed","kl":"Failed","kl-assets":"Failed","kl-example":"Failed"}');
+                }
+
+                return messageObject;   
             }
         </script>
     </body>
