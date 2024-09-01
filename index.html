@@ -15,7 +15,7 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-                <h6>v2.0.3</h6>
+                <h6>v2.0.4</h6>
                 <br>
 
                 <h2>Project Type</h2>
@@ -365,12 +365,11 @@
 
             function Get(yourUrl){
                 var Httpreq = new XMLHttpRequest();
-                Httpreq.open("GET",yourUrl,false);
-                Httpreq.send(null);
-
                 var messageObject;
                 try {
-                    messageObject = JSON.parse(message);
+                    Httpreq.open("GET",yourUrl,false);
+                    Httpreq.send(null);
+                    messageObject = JSON.parse(Httpreq.responseText);
                 } catch (e) {
                     messageObject = JSON.parse('{"ecs":"Failed","kl":"Failed","kl-assets":"Failed","kl-example":"Failed"}');
                 }
