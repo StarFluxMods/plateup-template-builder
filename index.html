@@ -365,9 +365,16 @@
 
             function Get(yourUrl){
                 var Httpreq = new XMLHttpRequest();
-                Httpreq.open("GET",yourUrl,false);
-                Httpreq.send(null);
-                return JSON.parse(Httpreq.responseText);          
+                var messageObject;
+                try {
+                    Httpreq.open("GET",yourUrl,false);
+                    Httpreq.send(null);
+                    messageObject = JSON.parse(Httpreq.responseText);
+                } catch (e) {
+                    messageObject = JSON.parse('{"ecs":"Failed","kl":"Failed","kl-assets":"Failed","kl-example":"Failed"}');
+                }
+
+                return messageObject;   
             }
         </script>
     </body>
