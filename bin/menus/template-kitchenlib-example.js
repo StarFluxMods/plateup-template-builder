@@ -91,6 +91,12 @@ async function Run() {
     {
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/.gitignore', 'MyMod', cleanedProjectName);
     }
+    
+    if (await fs.existsSync('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset'))
+    {
+        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset', 'My Mod', displayName);
+        await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset', 'My Name', author);
+    }
 
     await fs.renameSync('./' + cleanedProjectName + '/UnityProject - MyMod', './' + cleanedProjectName + '/UnityProject - ' + cleanedProjectName);
 
