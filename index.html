@@ -15,7 +15,7 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-                <h6>v2.1.4</h6>
+                <h6>v2.1.5</h6>
                 <br>
 
                 <h2>Project Type</h2>
@@ -330,10 +330,16 @@
                 } else if (filename.endsWith(".ogg")) {
                     const oggData = await fetchOggData(`${URL_PREFIX}/${urlPath}/${filename}`);
                     zip.file(`${path}${filename}`, oggData);
-                } else {
-                    const data = await fetchText(`${urlPath}/${filename}`);
+                }  else {
+                    let data = await fetchText(`${urlPath}/${filename}`);
+                    data = replacePlaceholdersInUnityFiles(data);
                     zip.file(`${path}${filename}`, data);
                 }
+            };
+
+            const replacePlaceholdersInUnityFiles = (unityFile) => {
+                return unityFile.replaceAll("My Mod", modNameElement.value)
+                    .replaceAll("My Name", authorElement.value);
             };
 
             const fetchFBXData = async (filename) => {
