@@ -91,12 +91,19 @@ async function Run() {
     {
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/.gitignore', 'MyMod', cleanedProjectName);
     }
-    
+
+    console.log('Checking For ProjectSettings File');
+    console.log('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset');
+
     if (await fs.existsSync('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset'))
     {
+        console.log('Found File');
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset', 'My Mod', displayName);
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset', 'My Name', author);
-    }
+    }else
+        {
+            console.log('File Missing');
+        }
 
     await fs.renameSync('./' + cleanedProjectName + '/UnityProject - MyMod', './' + cleanedProjectName + '/UnityProject - ' + cleanedProjectName);
 
