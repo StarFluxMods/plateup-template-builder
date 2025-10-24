@@ -11,6 +11,7 @@ async function Run() {
 
     // Get project details
 
+    console.log('Checking For ProjectSettings File');
     let modId = await menuUtils.GetUserInput("project modId: ");
     let displayName = await menuUtils.GetUserInput("project displayName: ");
     let author = await menuUtils.GetUserInput("project author: ");
@@ -92,18 +93,11 @@ async function Run() {
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/.gitignore', 'MyMod', cleanedProjectName);
     }
 
-    console.log('Checking For ProjectSettings File');
-    console.log('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset');
-
     if (await fs.existsSync('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset'))
     {
-        console.log('Found File');
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset', 'My Mod', displayName);
         await generationUtils.ReplaceInFile('./' + cleanedProjectName + '/UnityProject - MyMod/ProjectSettings/ProjectSettings.asset', 'My Name', author);
-    }else
-        {
-            console.log('File Missing');
-        }
+    }
 
     await fs.renameSync('./' + cleanedProjectName + '/UnityProject - MyMod', './' + cleanedProjectName + '/UnityProject - ' + cleanedProjectName);
 
