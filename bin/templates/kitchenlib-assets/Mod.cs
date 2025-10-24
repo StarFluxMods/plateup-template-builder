@@ -15,7 +15,7 @@ namespace KitchenMyMod
         public const string MOD_NAME = "My Mod";
         public const string MOD_VERSION = "0.1.0";
         public const string MOD_AUTHOR = "My Name";
-        public const string MOD_GAMEVERSION = ">=1.1.9";
+        public const string MOD_GAMEVERSION = ">=1.3.0";
 
         internal static AssetBundle Bundle;
         internal static KitchenLogger Logger;
