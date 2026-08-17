@@ -20,6 +20,6 @@ const buildScriptForDirectory = (directory, variableAndScriptName) => {
     console.log(variableAndScriptName, scriptContents);
 }
 
-buildScriptForDirectory("./bin/templates/kitchenlib-assets/UnityProject - MyMod/", "kitchenlibassets");
-buildScriptForDirectory("./bin/templates/kitchenlib-example/UnityProject - MyMod/", "kitchenlibexample");
-buildScriptForDirectory("./bin/templates/kitchenlib-example/Customs/", "kitchenlibexamplecustoms");
+buildScriptForDirectory("./templates/kitchenlib-assets/UnityProject - MyMod/", "kitchenlibassets");
+buildScriptForDirectory("./templates/kitchenlib-example/UnityProject - MyMod/", "kitchenlibexample");
+buildScriptForDirectory("./templates/kitchenlib-example/Customs/", "kitchenlibexamplecustoms");

@@ -15,7 +15,7 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-                <h6>v2.1.7</h6>
+                <h6>v2.2.0</h6>
                 <br>
 
                 <h2>Project Type</h2>
@@ -88,7 +88,7 @@
         <script type="text/javascript" src="./kitchenlibassets.js"></script>
         <script type="text/javascript" src="./kitchenlibexample.js"></script>
         <script type="text/javascript" src="./kitchenlibexamplecustoms.js"></script>
-        <script type="text/javascript" src="./bin/utils/global-references.js"></script>
+        <script type="text/javascript" src="./global-references.js"></script>
         <script type="text/javascript">
             const SETTINGS_KEY = "settings";
             const URL_PREFIX = "https://starfluxmods.github.io/plateup-template-builder/"; // change to "https://yourghpage.github.io/" when testing locally
@@ -186,9 +186,9 @@
                 const zip = new JSZip();
                 const modName = modNameStripped();
 
-                await addGitignoreToZip(zip, modName, `bin/templates/ecs/template.gitignore`);
-                await addModCsToZip(zip, modName, `bin/templates/ecs/Mod.cs`);
-                await addProjectFileToZip(zip, modName, `bin/templates/ecs/project.csproj`);
+                await addGitignoreToZip(zip, modName, `templates/ecs/template.gitignore`);
+                await addModCsToZip(zip, modName, `templates/ecs/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `templates/ecs/project.csproj`);
 
                 return await addChangelogsToZipIfNeeded(zip);
             };
@@ -197,9 +197,9 @@
                 const zip = new JSZip();
                 const modName = modNameStripped();
 
-                await addGitignoreToZip(zip, modName, `bin/templates/kitchenlib/template.gitignore`);
-                await addModCsToZip(zip, modName, `bin/templates/kitchenlib/Mod.cs`);
-                await addProjectFileToZip(zip, modName, `bin/templates/kitchenlib/project.csproj`);
+                await addGitignoreToZip(zip, modName, `templates/kitchenlib/template.gitignore`);
+                await addModCsToZip(zip, modName, `templates/kitchenlib/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `templates/kitchenlib/project.csproj`);
 
                 return await addChangelogsToZipIfNeeded(zip);
             };
@@ -208,10 +208,10 @@
                 const zip = new JSZip();
                 const modName = modNameStripped();
 
-                await addGitignoreToZip(zip, modName, `bin/templates/kitchenlib-assets/template.gitignore`);
-                await addModCsToZip(zip, modName, `bin/templates/kitchenlib-assets/Mod.cs`);
-                await addProjectFileToZip(zip, modName, `bin/templates/kitchenlib-assets/project.csproj`);
-                await addUnityProjectToZip(zip, modName, `bin/templates/kitchenlib-assets/UnityProject - MyMod`, kitchenlibassets);
+                await addGitignoreToZip(zip, modName, `templates/kitchenlib-assets/template.gitignore`);
+                await addModCsToZip(zip, modName, `templates/kitchenlib-assets/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `templates/kitchenlib-assets/project.csproj`);
+                await addUnityProjectToZip(zip, modName, `templates/kitchenlib-assets/UnityProject - MyMod`, kitchenlibassets);
 
                 return await addChangelogsToZipIfNeeded(zip);
             };
@@ -220,13 +220,13 @@
                 const zip = new JSZip();
                 const modName = modNameStripped();
 
-                await addGitignoreToZip(zip, modName, `bin/templates/kitchenlib-example/template.gitignore`);
-                await addModCsToZip(zip, modName, `bin/templates/kitchenlib-example/Mod.cs`);
-                await addProjectFileToZip(zip, modName, `bin/templates/kitchenlib-example/project.csproj`);
-                await addUnityProjectToZip(zip, modName, `bin/templates/kitchenlib-example/UnityProject - MyMod`, kitchenlibexample);
+                await addGitignoreToZip(zip, modName, `templates/kitchenlib-example/template.gitignore`);
+                await addModCsToZip(zip, modName, `templates/kitchenlib-example/Mod.cs`);
+                await addProjectFileToZip(zip, modName, `templates/kitchenlib-example/project.csproj`);
+                await addUnityProjectToZip(zip, modName, `templates/kitchenlib-example/UnityProject - MyMod`, kitchenlibexample);
 
                 for (const filename of kitchenlibexamplecustoms) {
-                    let file = await fetchText(`bin/templates/kitchenlib-example/Customs/${filename}`);
+                    let file = await fetchText(`templates/kitchenlib-example/Customs/${filename}`);
                     file = file.replaceAll("KitchenMyMod", namespaceElement.value);
                     zip.file(`${modName}/Customs/${filename}`, file);
                 }
@@ -284,8 +284,8 @@
             const AddChangelogsToZip = async (zip) => {
                 const modName = modNameStripped();
 
-                let github = await fetchText(`bin/templates/changelogs/GitHub/v0.1.0.md`);
-                let workshop = await fetchText(`bin/templates/changelogs/Workshop/v0.1.0.bbcode`);
+                let github = await fetchText(`templates/changelogs/GitHub/v0.1.0.md`);
+                let workshop = await fetchText(`templates/changelogs/Workshop/v0.1.0.bbcode`);
 
                 github = github.replaceAll("0.1.0", versionElement.value);
                 workshop = workshop.replaceAll("0.1.0", versionElement.value);
