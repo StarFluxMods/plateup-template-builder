@@ -13,6 +13,7 @@ The site is a static page served from the repository root:
 - `index.html` - the page itself, including the generation logic.
 - `global-references.js` - shared values used by the page, such as the default nuget version.
 - `templates/` - the template files the page fetches and packs into the generated zip.
+- `templates/README.md` - the readme shared by every template. Blocks wrapped in `<!-- name -->...<!-- /name -->` are only kept for project types that enable that section (`kitchenlib`, `unity`, `customs`, `changelogs`).
 - `kitchenlibassets.js`, `kitchenlibexample.js`, `kitchenlibexamplecustoms.js` - auto-generated file listings for the Unity projects and example customs.
 
 After adding, removing or renaming files under `templates/`, regenerate the file listings with:

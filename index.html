@@ -15,7 +15,7 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-                <h6>v2.2.1</h6>
+                <h6>v2.2.2</h6>
                 <br>
 
                 <h2>Project Type</h2>
@@ -189,6 +189,7 @@
                 await addGitignoreToZip(zip, modName, `templates/ecs/template.gitignore`);
                 await addModCsToZip(zip, modName, `templates/ecs/Mod.cs`);
                 await addProjectFileToZip(zip, modName, `templates/ecs/project.csproj`);
+                await addReadmeToZip(zip, modName, {});
 
                 return await addChangelogsToZipIfNeeded(zip);
             };
@@ -200,6 +201,7 @@
                 await addGitignoreToZip(zip, modName, `templates/kitchenlib/template.gitignore`);
                 await addModCsToZip(zip, modName, `templates/kitchenlib/Mod.cs`);
                 await addProjectFileToZip(zip, modName, `templates/kitchenlib/project.csproj`);
+                await addReadmeToZip(zip, modName, { kitchenlib: true });
 
                 return await addChangelogsToZipIfNeeded(zip);
             };
@@ -212,6 +214,7 @@
                 await addModCsToZip(zip, modName, `templates/kitchenlib-assets/Mod.cs`);
                 await addProjectFileToZip(zip, modName, `templates/kitchenlib-assets/project.csproj`);
                 await addUnityProjectToZip(zip, modName, `templates/kitchenlib-assets/UnityProject - MyMod`, kitchenlibassets);
+                await addReadmeToZip(zip, modName, { kitchenlib: true, unity: true });
 
                 return await addChangelogsToZipIfNeeded(zip);
             };
@@ -224,6 +227,7 @@
                 await addModCsToZip(zip, modName, `templates/kitchenlib-example/Mod.cs`);
                 await addProjectFileToZip(zip, modName, `templates/kitchenlib-example/project.csproj`);
                 await addUnityProjectToZip(zip, modName, `templates/kitchenlib-example/UnityProject - MyMod`, kitchenlibexample);
+                await addReadmeToZip(zip, modName, { kitchenlib: true, unity: true, customs: true });
 
                 for (const filename of kitchenlibexamplecustoms) {
                     let file = await fetchText(`templates/kitchenlib-example/Customs/${filename}`);
@@ -247,6 +251,25 @@
             const addProjectFileToZip = async (zip, modName, pathToProjectFile) => {
                 const projectFile = await fetchText(pathToProjectFile);
                 zip.file(`${modName}/${modName}.csproj`, replacePlaceholdersInProjectFile(projectFile, modName));
+            };
+
+            const addReadmeToZip = async (zip, modName, sections) => {
+                const readme = await fetchText(`templates/README.md`);
+                const allSections = { ...sections, changelogs: ShouldGenerateChangelogs() };
+                zip.file(`${modName}/README.md`, replacePlaceholdersInReadme(applyReadmeSections(readme, allSections), modName));
+            };
+
+            // Keeps the contents of each "<!-- name -->...<!-- /name -->" block whose section is enabled, and removes the rest.
+            const applyReadmeSections = (readme, sections) => {
+                return readme.replace(/<!-- (\w+) -->\r?\n([\s\S]*?)<!-- \/\1 -->\r?\n/g, (_, name, contents) => sections[name] ? contents : "");
+            };
+
+            const replacePlaceholdersInReadme = (readme, modName) => {
+                return readme.replaceAll("com.example.mymod", modGuidElement.value)
+                    .replaceAll("My Mod", modNameElement.value)
+                    .replaceAll("My Name", authorElement.value)
+                    .replaceAll("0.1.0", versionElement.value)
+                    .replaceAll("MyMod", modName);
             };
 
             const replacePlaceholdersInModCs = (modCs) => {
