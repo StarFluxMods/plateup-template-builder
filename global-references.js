@@ -1,1 +1,2 @@
 const NUGET_VERSION = "1.11.5";
+const STARFLUX_NUGET_VERSION = "1.0.0";

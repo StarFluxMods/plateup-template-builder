@@ -15,7 +15,7 @@
         <div class="container">
             <form>
                 <h1>PlateUp Template Builder</h1>
-                <h6>v2.2.2</h6>
+                <h6>v2.2.3</h6>
                 <br>
 
                 <h2>Project Type</h2>
@@ -66,6 +66,10 @@
                     <input class="form-control" type="text" id="metadata-nugetversion" value="1.11.5" required />
                     <label for="metadata-nugetversion">Nuget Version - Don't change unless required</label>
                 </div>
+                <div class="form-check form-switch mb-3" id="starflux-build-utilities-container" hidden>
+                    <input class="form-check-input saveable" type="checkbox" id="metadata-use-starflux-build-utilities" />
+                    <label class="form-check-label" for="metadata-use-starflux-build-utilities">Use StarFluxGames.PlateUp.ModBuildUtilities</label>
+                </div>
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input saveable" type="checkbox" id="metadata-generate-changelogs" checked />
                     <label class="form-check-label" for="metadata-generate-changelogs">Generate Changelog Folders</label>
@@ -91,6 +95,8 @@
         <script type="text/javascript" src="./global-references.js"></script>
         <script type="text/javascript">
             const SETTINGS_KEY = "settings";
+            const PREVIEW_KEY = "preview";
+            const PREVIEW_UNLOCK_VALUE = "starflux";
             const URL_PREFIX = "https://starfluxmods.github.io/plateup-template-builder/"; // change to "https://yourghpage.github.io/" when testing locally
             const API_URL = "https://api.plateupmodding.com/plateup_template_counter/";
             
@@ -114,6 +120,8 @@
             const versionElement = document.querySelector("#metadata-version");
             const nugetVersionElement = document.querySelector("#metadata-nugetversion");
             const generateGitRepoElement = document.querySelector("#other-settings-create-git-repo");
+            const starFluxBuildUtilitiesContainer = document.querySelector("#starflux-build-utilities-container");
+            const useStarFluxBuildUtilitiesElement = document.querySelector("#metadata-use-starflux-build-utilities");
             const form = document.querySelector("form");
             const generateButton = document.querySelector("#generate");
 
@@ -133,6 +141,31 @@
                 updateNamespace();
             });
             useKitchenPrefixElement.addEventListener("change", updateNamespace);
+
+            // Preview features are unlocked with "?preview=starflux" and locked again with "?preview=off".
+            // The choice is remembered in this browser, and the parameter is removed from the address bar.
+            const applyPreviewUnlockFromUrl = () => {
+                const url = new URL(window.location.href);
+                const preview = url.searchParams.get(PREVIEW_KEY);
+                if (preview === null) {
+                    return;
+                }
+
+                if (preview === PREVIEW_UNLOCK_VALUE) {
+                    localStorage.setItem(PREVIEW_KEY, PREVIEW_UNLOCK_VALUE);
+                } else {
+                    localStorage.removeItem(PREVIEW_KEY);
+                }
+
+                url.searchParams.delete(PREVIEW_KEY);
+                window.history.replaceState(null, "", url);
+            };
+
+            const isPreviewUnlocked = () => localStorage.getItem(PREVIEW_KEY) === PREVIEW_UNLOCK_VALUE;
+            const isUseStarFluxBuildUtilities = () => isPreviewUnlocked() && isChecked(useStarFluxBuildUtilitiesElement);
+            const updateNugetVersion = () => nugetVersionElement.value = isUseStarFluxBuildUtilities() ? STARFLUX_NUGET_VERSION : NUGET_VERSION;
+
+            useStarFluxBuildUtilitiesElement.addEventListener("change", updateNugetVersion);
 
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
@@ -255,7 +288,12 @@
 
             const addReadmeToZip = async (zip, modName, sections) => {
                 const readme = await fetchText(`templates/README.md`);
-                const allSections = { ...sections, changelogs: ShouldGenerateChangelogs() };
+                const allSections = {
+                    ...sections,
+                    changelogs: ShouldGenerateChangelogs(),
+                    starflux: isUseStarFluxBuildUtilities(),
+                    yariazen: !isUseStarFluxBuildUtilities()
+                };
                 zip.file(`${modName}/README.md`, replacePlaceholdersInReadme(applyReadmeSections(readme, allSections), modName));
             };
 
@@ -284,7 +322,17 @@
                 return gitignore.replaceAll("MyMod", modName);  
             };
 
+            // StarFluxGames.PlateUp.ModBuildUtilities finds the asset bundle itself, so the AssetBundlePath property is dropped.
+            const applyStarFluxBuildUtilities = (projectFile) => {
+                return projectFile.replace(`<PackageReference Include="Yariazen.PlateUp.ModBuildUtilities" Version="NUGET_VERSION" />`, `<PackageReference Include="StarFluxGames.PlateUp.ModBuildUtilities" Version="NUGET_VERSION" PrivateAssets="all" />`)
+                    .replace(/^[ \t]*<AssetBundlePath>.*<\/AssetBundlePath>\r?\n/m, "");
+            };
+
             const replacePlaceholdersInProjectFile = (projectFile, modName) => {
+                if (isUseStarFluxBuildUtilities()) {
+                    projectFile = applyStarFluxBuildUtilities(projectFile);
+                }
+
                 return projectFile.replaceAll("NUGET_VERSION", nugetVersionElement.value)
                 .replaceAll("MyMod", modName);  
             };
@@ -342,6 +390,10 @@
             const valueAttributeByElementType = element => element.type === "text" ? "value" : "checked";
 
             loadSettings();
+
+            applyPreviewUnlockFromUrl();
+            starFluxBuildUtilitiesContainer.hidden = !isPreviewUnlocked();
+            updateNugetVersion();
 
             const handleFiles = async (zip, path, urlPath, filename) => {
                 if (filename.endsWith(".fbx")) {

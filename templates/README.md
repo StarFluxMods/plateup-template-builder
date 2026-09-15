@@ -32,7 +32,12 @@ Subscribe to the mod on the Steam Workshop.
 
 ### Building
 
+<!-- yariazen -->
 Open `MyMod.csproj` in your IDE and build. The [Yariazen.PlateUp.ModBuildUtilities](https://github.com/Yariazen/Yaraizen.PlateUp.ModBuildUtilities) package pulls in the game's references and copies the built mod to your PlateUp! mods folder automatically.
+<!-- /yariazen -->
+<!-- starflux -->
+Open `MyMod.csproj` in your IDE and build. The [StarFluxGames.PlateUp.ModBuildUtilities](https://www.nuget.org/packages/StarFluxGames.PlateUp.ModBuildUtilities) package pulls in the game's references and copies the built mod to your PlateUp! mods folder automatically.
+<!-- /starflux -->
 <!-- unity -->
 
 ### Building assets
